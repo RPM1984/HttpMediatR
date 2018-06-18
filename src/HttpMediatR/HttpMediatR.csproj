@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>0.0.1</Version>
+    <Version>1.0.0</Version>
     <Authors>Ryan Miranda</Authors>
     <Description>An easy way to respond to ASP.NET Core API requests with MediatR.</Description>
     <PackageLicenseUrl>https://github.com/RPM1984/HttpMediatR/blob/master/LICENSE</PackageLicenseUrl>
@@ -14,12 +14,7 @@
   <ItemGroup>
     <PackageReference Include="MediatR" Version="4.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.0.4" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Microsoft.AspNetCore.Mvc.Formatters.Json">
-      <HintPath>..\..\..\..\Users\Ryan\.nuget\packages\microsoft.aspnetcore.mvc.formatters.json\2.0.4\lib\netstandard2.0\Microsoft.AspNetCore.Mvc.Formatters.Json.dll</HintPath>
-    </Reference>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Formatters.Json" Version="2.0.4" />
   </ItemGroup>
 
 </Project>
