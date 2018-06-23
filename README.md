@@ -2,7 +2,7 @@
 A library that combines two awesome things: ASP.NET Core & MediatR, and makes your life easier when you're using them together. :two_hearts:
 
 # Status
-TODO: VSTS, Codecov
+![Visual Studio Team services](https://img.shields.io/vso/build/rpm1984/b191ce56-b252-49c8-bba2-23e75b32ab0b/3.svg?style=plastic) ![Codecov](https://img.shields.io/codecov/c/github/RPM1984/HttpMediatR.svg?style=plastic)
 
 # Installation
 TODO: get NuGet image
