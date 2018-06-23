@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace HttpMediatR
@@ -12,7 +13,7 @@ namespace HttpMediatR
     /// </summary>
     /// <typeparam name="TRequest">The type of model in the HTTP Request.</typeparam>
     /// <typeparam name="TResponse">The type of model to respond with.</typeparam>
-    public abstract class HttpHandler<TRequest, TResponse> : AsyncRequestHandler<TRequest, IActionResult>
+    public abstract class HttpHandler<TRequest, TResponse> : IRequestHandler<TRequest, IActionResult>
         where TRequest : class, IHttpRequest
         where TResponse : class
     {
@@ -23,9 +24,9 @@ namespace HttpMediatR
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        protected override async Task<IActionResult> HandleCore(TRequest request)
+        public async Task<IActionResult> Handle(TRequest request, CancellationToken cancellationToken)
         {
-            _logger.LogTrace(nameof(HandleCore));
+            _logger.LogTrace(nameof(Handle));
 
             if (request == null)
             {
@@ -34,7 +35,7 @@ namespace HttpMediatR
 
             _logger.LogDebug("Beginning request: {@request}", request);
 
-            var response = await HandleAsync(request).ConfigureAwait(false);
+            var response = await HandleAsync(request, cancellationToken).ConfigureAwait(false);
 
             _logger.LogDebug("Got a response: {@response}", response);
 
@@ -63,7 +64,7 @@ namespace HttpMediatR
         /// </summary>
         /// <param name="query">The query passed to MediatR.</param>
         /// <returns></returns>
-        protected abstract Task<HttpResponse<TResponse>> HandleAsync(TRequest input);
+        protected abstract Task<HttpResponse<TResponse>> HandleAsync(TRequest input, CancellationToken cancellationToken);
 
         /// <summary>
         /// Respond successfully to a HTTP request with a 200 (OK) response.

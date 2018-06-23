@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace HttpMediatR.Samples.AspNetCoreMvc.Handlers
@@ -23,7 +24,7 @@ namespace HttpMediatR.Samples.AspNetCoreMvc.Handlers
 
             public Handler(ILogger<Handler> logger) : base(logger) => _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            protected override Task<HttpResponse<Output>> HandleAsync(Input input)
+            protected override Task<HttpResponse<Output>> HandleAsync(Input input, CancellationToken cancellationToken)
             {
                 _logger.LogTrace(nameof(HandleAsync));
 
