@@ -11,7 +11,7 @@ namespace HttpMediatR.Samples.AspNetCoreMvc.Handlers
         {
             public int ProductId { get; set; }
         }
-        
+
         public class Handler : HttpHandler<Input>
         {
             private readonly ILogger<Handler> _logger;

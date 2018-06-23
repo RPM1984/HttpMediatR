@@ -11,6 +11,7 @@ namespace HttpMediatR.Samples.AspNetCoreMvc.Handlers
         {
             public int ProductId { get; set; }
             public bool CauseConflict { get; set; }
+            public bool IncludeModel { get; set; }
         }
 
         public class Output
@@ -38,10 +39,12 @@ namespace HttpMediatR.Samples.AspNetCoreMvc.Handlers
                     return Task.FromResult(Conflict("Oops! Conflict occured :("));
                 }
 
-                return Task.FromResult(Created(new Output
-                {
-                    OrderId = input.ProductId + 1
-                }));
+                return Task.FromResult(input.IncludeModel
+                    ? Created(new Output
+                      {
+                        OrderId = input.ProductId + 1
+                      })
+                    : Created());
             }
         }
     }

@@ -12,12 +12,16 @@ namespace HttpMediatR.Tests
 
         public Router(IMediator mediator) => _mediator = mediator;
 
-        [HttpGet("/products/{id:int}")]
+        [HttpGet("/products/{productId:int}")]
         public Task<IActionResult> GetProduct(GetProduct.Input query, CancellationToken cancellationToken)
             => _mediator.Send(query, cancellationToken);
 
         [HttpPost("/orders")]
         public Task<IActionResult> OrderProduct([FromBody] OrderProduct.Input command, CancellationToken cancellationToken)
             => _mediator.Send(command, cancellationToken);
+
+        [HttpDelete("/products/{productId:int}")]
+        public Task<IActionResult> DeleteProduct(DeleteProduct.Input query, CancellationToken cancellationToken)
+            => _mediator.Send(query, cancellationToken);
     }
 }

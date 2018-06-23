@@ -9,12 +9,12 @@ namespace HttpMediatR.Samples.AspNetCoreMvc.Handlers
     {
         public class Input : IHttpRequest
         {
-            public int Id { get; set; }
+            public int ProductId { get; set; }
         }
 
         public class Output
         {
-            public int Id { get; set; }
+            public int ProductId { get; set; }
             public string Name { get; set; }
         }
 
@@ -28,15 +28,15 @@ namespace HttpMediatR.Samples.AspNetCoreMvc.Handlers
             {
                 _logger.LogTrace(nameof(HandleAsync));
 
-                if (input.Id == 0)
+                if (input.ProductId == 0)
                 {
                     return Task.FromResult(NotFound());
                 }
 
                 return Task.FromResult(Ok(new Output
                 {
-                    Id = input.Id,
-                    Name = $"Product #{input.Id}"
+                    ProductId = input.ProductId,
+                    Name = $"Product #{input.ProductId}"
                 }));
             }
         }

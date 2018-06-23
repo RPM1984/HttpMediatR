@@ -11,7 +11,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace HttpMediatR.Tests.HttpHandler
+namespace HttpMediatR.Tests
 {
     public class HttpHandlerTests
     {
@@ -30,22 +30,22 @@ namespace HttpMediatR.Tests.HttpHandler
             // Arrange.
             var logger = new Mock<ILogger<Samples.AspNetCoreMvc.Handlers.GetProduct.Handler>>();
             var handler = new Samples.AspNetCoreMvc.Handlers.GetProduct.Handler(logger.Object);
-            var query = new Samples.AspNetCoreMvc.Handlers.GetProduct.Input { Id = 1 };
+            var query = new Samples.AspNetCoreMvc.Handlers.GetProduct.Input { ProductId = 1 };
             var expectedModel = new Samples.AspNetCoreMvc.Handlers.GetProduct.Output
             {
-                Id = query.Id,
-                Name = $"Product #{query.Id}"
+                ProductId = query.ProductId,
+                Name = $"Product #{query.ProductId}"
             };
 
             // Act.
-            var result = await _client.GetAsync($"/products/{query.Id}");
+            var result = await _client.GetAsync($"/products/{query.ProductId}");
 
             // Assert.
             result.ShouldNotBeNull();
             result.StatusCode.ShouldBe(HttpStatusCode.OK);
             result.Content.ShouldNotBeNull();
             var resultObj = JsonConvert.DeserializeObject<Samples.AspNetCoreMvc.Handlers.GetProduct.Output>(await result.Content.ReadAsStringAsync());
-            resultObj.Id.ShouldBe(expectedModel.Id);
+            resultObj.ProductId.ShouldBe(expectedModel.ProductId);
             resultObj.Name.ShouldBe(expectedModel.Name);
         }
 
@@ -55,23 +55,25 @@ namespace HttpMediatR.Tests.HttpHandler
             // Arrange.
             var logger = new Mock<ILogger<Samples.AspNetCoreMvc.Handlers.GetProduct.Handler>>();
             var handler = new Samples.AspNetCoreMvc.Handlers.GetProduct.Handler(logger.Object);
-            var query = new Samples.AspNetCoreMvc.Handlers.GetProduct.Input { Id = 0 };
+            var query = new Samples.AspNetCoreMvc.Handlers.GetProduct.Input { ProductId = 0 };
 
             // Act.
-            var result = await _client.GetAsync($"/products/{query.Id}");
+            var result = await _client.GetAsync($"/products/{query.ProductId}");
 
             // Assert.
             result.ShouldNotBeNull();
             result.StatusCode.ShouldBe(HttpStatusCode.NotFound);
         }
 
-        [Fact]
-        public async Task GivenAnOrderForAProductThatExists_ReturnsExpectedResult()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task GivenAnOrderForAProductThatExists_ReturnsExpectedResult(bool includeModel)
         {
             // Arrange.
             var logger = new Mock<ILogger<Samples.AspNetCoreMvc.Handlers.OrderProduct.Handler>>();
             var handler = new Samples.AspNetCoreMvc.Handlers.OrderProduct.Handler(logger.Object);
-            var command = new Samples.AspNetCoreMvc.Handlers.OrderProduct.Input { ProductId = 1 };
+            var command = new Samples.AspNetCoreMvc.Handlers.OrderProduct.Input { ProductId = 1, IncludeModel = includeModel };
             var expectedModel = new Samples.AspNetCoreMvc.Handlers.OrderProduct.Output
             {
                 OrderId = command.ProductId + 1
@@ -83,10 +85,14 @@ namespace HttpMediatR.Tests.HttpHandler
             // Assert.
             result.ShouldNotBeNull();
             result.StatusCode.ShouldBe(HttpStatusCode.Created);
-            result.Content.ShouldNotBeNull();
-            var resultObj = JsonConvert.DeserializeObject<Samples.AspNetCoreMvc.Handlers.OrderProduct.Output>(await result.Content.ReadAsStringAsync());
-            resultObj.ShouldNotBeNull();
-            resultObj.OrderId.ShouldBe(expectedModel.OrderId);
+
+            if (includeModel)
+            {
+                result.Content.ShouldNotBeNull();
+                var resultObj = JsonConvert.DeserializeObject<Samples.AspNetCoreMvc.Handlers.OrderProduct.Output>(await result.Content.ReadAsStringAsync());
+                resultObj.ShouldNotBeNull();
+                resultObj.OrderId.ShouldBe(expectedModel.OrderId);
+            }
         }
 
         [Fact]
@@ -119,6 +125,38 @@ namespace HttpMediatR.Tests.HttpHandler
             // Assert.
             result.ShouldNotBeNull();
             result.StatusCode.ShouldBe(HttpStatusCode.Conflict);
+        }
+
+        [Fact]
+        public async Task GivenARequestTryingToDeleteAProductThatExists_ReturnsExpectedResult()
+        {
+            // Arrange.
+            var logger = new Mock<ILogger<Samples.AspNetCoreMvc.Handlers.DeleteProduct.Handler>>();
+            var handler = new Samples.AspNetCoreMvc.Handlers.DeleteProduct.Handler(logger.Object);
+            var query = new Samples.AspNetCoreMvc.Handlers.DeleteProduct.Input { ProductId = 1 };
+
+            // Act.
+            var result = await _client.DeleteAsync($"/products/{query.ProductId}");
+
+            // Assert.
+            result.ShouldNotBeNull();
+            result.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+        }
+
+        [Fact]
+        public async Task GivenARequestTryingToDeleteAProductThatDoesntExist_ReturnsExpectedResult()
+        {
+            // Arrange.
+            var logger = new Mock<ILogger<Samples.AspNetCoreMvc.Handlers.DeleteProduct.Handler>>();
+            var handler = new Samples.AspNetCoreMvc.Handlers.DeleteProduct.Handler(logger.Object);
+            var query = new Samples.AspNetCoreMvc.Handlers.DeleteProduct.Input { ProductId = 0 };
+
+            // Act.
+            var result = await _client.DeleteAsync($"/products/{query.ProductId}");
+
+            // Assert.
+            result.ShouldNotBeNull();
+            result.StatusCode.ShouldBe(HttpStatusCode.NotFound);
         }
     }
 }

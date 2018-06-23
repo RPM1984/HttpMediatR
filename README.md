@@ -8,8 +8,8 @@ A library that combines two awesome things: ASP.NET Core & MediatR, and makes yo
 TODO: get NuGet image
 
 # How to use
-- Instead of your input model implementing `IRequest<T>`, implement `IHttpRequest`
-- Instead of your handler implementing IRequestHandler<T,T2>, inherit from `HttpHandler<TRequest>`
+- Instead of your input model implementing `IRequest`, implement `IHttpRequest`
+- Instead of your handler implementing `IRequestHandler`, inherit from `HttpHandler`
 - Implement the `HandleAsync` abstract method in your handler
 - Make use of the inherited helpers to return the appropriate responses
 - Marvel at your awesome code! :star:
@@ -37,8 +37,7 @@ public Task<IActionResult> Index(Query query, CancellationToken cancellationToke
             => _mediator.Send(query, cancellationToken);
 ```
 
-So that's even better! :sunglasses:. 
-In fact, you'll see in the source code there is a file called `Router.cs` instead of many controllers. This is because we don't really have controllers anymore..just a router passing on all the resposibility to handle the HTTP request to your MediatR handler, so there's no real need to seperate into multiple controllers (of course, feel free to do so if you like!)
+So that's even better! :sunglasses:. We no longer need to write the boring "get something, see if it exists, return not found or ok depending on that blah blah", and it's just a 1 liner. In fact, you'll see in the source code there is a file called `Router.cs` instead of many controllers. This is because we don't really have controllers anymore..just a router passing on all the resposibility to handle the HTTP request to your MediatR handler, so there's no real need to seperate into multiple controllers (of course, feel free to do so if you like!)
 
 ### [Throwing uneccessary exceptions](http://jonskeet.uk/csharp/exceptions.html)
 Exceptions are pretty expensive..so ideally we'd like to avoid throwing them.
@@ -51,9 +50,10 @@ public class Handler : IRequestHandler<Query, MyModel>
 
     public Handler(SomeDbContext db) => _db = db;
 
-    protected async Task<MyModel> Handle(Query query)
+    protected async Task<MyModel> Handle(Query query,
+										 CancellationToken cancellationToken)
     {
-        var result = await _db.Get(query.Id);
+        var result = await _db.Get(query.Id, cancellationToken);
         if (result == null)
         {
             throw new Exception("Record not found.");
@@ -74,7 +74,8 @@ public class Handler : HttpHandler<Query, MyModel>
 
     public Handler(SomeDbContext db) => _db = db;
 
-    protected override async Task<HttpResponse<MyModel>> HandleAsync(Query query, CancellationToken cancellationToken)
+    protected override async Task<HttpResponse<MyModel>> HandleAsync(Query query,
+																	 CancellationToken cancellationToken)
     {
         var result = await _db.Get(query.Id, cancellationToken);
         if (result == null)
