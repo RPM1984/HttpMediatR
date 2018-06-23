@@ -9,11 +9,12 @@ TODO: get NuGet image
 
 # How to use
 - Instead of your input model implementing `IRequest<T>`, implement `IHttpRequest`
-- Instead of your handler inheriting from `AsyncRequestHandler<TRequest,TResponse>`, inherit from the `HttpHandler<TRequest,TResponse>`
+- Instead of your handler implementing IRequestHandler<T,T2>, inherit from `HttpHandler<TRequest>`
 - Implement the `HandleAsync` abstract method in your handler
+- Make use of the inherited helpers to return the appropriate responses
 - Marvel at your awesome code! :star:
 
-See the `TestHandler` for an example on the above.
+See the [sample project](https://github.com/RPM1984/HttpMediatR/tree/master/samples/HttpMediatR.Samples.AspNetCoreMvc) for a demo on the above.
 
 ## What problems does this library solve?
 ### [DRY (Don't repeat yourself)](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself)
@@ -44,13 +45,13 @@ Exceptions are pretty expensive..so ideally we'd like to avoid throwing them.
 
 Here's an example of where you'd need to throw one in your MediatR handler:
 ```
-public class Handler : AsyncRequestHandler<Query, MyModel>
+public class Handler : IRequestHandler<Query, MyModel>
 {
     private readonly SomeDbContext _db;
 
     public Handler(SomeDbContext db) => _db = db;
 
-    protected override async Task<MyModel> HandleCore(Query query)
+    protected async Task<MyModel> Handle(Query query)
     {
         var result = await _db.Get(query.Id);
         if (result == null)
@@ -73,9 +74,9 @@ public class Handler : HttpHandler<Query, MyModel>
 
     public Handler(SomeDbContext db) => _db = db;
 
-    protected override async Task<HttpResponse<MyModel>> HandleAsync(Query query)
+    protected override async Task<HttpResponse<MyModel>> HandleAsync(Query query, CancellationToken cancellationToken)
     {
-        var result = await _db.Get(query.Id);
+        var result = await _db.Get(query.Id, cancellationToken);
         if (result == null)
         {
             return NotFound();

@@ -5,19 +5,13 @@ using System.Threading.Tasks;
 
 namespace HttpMediatR.Samples.AspNetCoreMvc.Handlers
 {
-    public static class OrderProduct
+    public static class DeleteProduct
     {
         public class Input : IHttpRequest
         {
             public int ProductId { get; set; }
-            public bool CauseConflict { get; set; }
         }
-
-        public class Output
-        {
-            public int OrderId { get; set; }
-        }
-
+        
         public class Handler : HttpHandler<Input>
         {
             private readonly ILogger<Handler> _logger;
@@ -33,15 +27,7 @@ namespace HttpMediatR.Samples.AspNetCoreMvc.Handlers
                     return Task.FromResult(NotFound());
                 }
 
-                if (input.CauseConflict)
-                {
-                    return Task.FromResult(Conflict("Oops! Conflict occured :("));
-                }
-
-                return Task.FromResult(Created(new Output
-                {
-                    OrderId = input.ProductId + 1
-                }));
+                return Task.FromResult(NoContent());
             }
         }
     }

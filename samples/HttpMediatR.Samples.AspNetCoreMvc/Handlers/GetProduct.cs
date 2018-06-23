@@ -18,13 +18,13 @@ namespace HttpMediatR.Samples.AspNetCoreMvc.Handlers
             public string Name { get; set; }
         }
 
-        public class Handler : HttpHandler<Input, Output>
+        public class Handler : HttpHandler<Input>
         {
             private readonly ILogger<Handler> _logger;
 
             public Handler(ILogger<Handler> logger) : base(logger) => _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            protected override Task<HttpResponse<Output>> HandleAsync(Input input, CancellationToken cancellationToken)
+            protected override Task<HttpResponse> HandleAsync(Input input, CancellationToken cancellationToken)
             {
                 _logger.LogTrace(nameof(HandleAsync));
 

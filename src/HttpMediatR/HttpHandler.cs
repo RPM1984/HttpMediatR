@@ -12,10 +12,8 @@ namespace HttpMediatR
     /// Provides a common MediatR handler to respond to ASP.NET Core MVC requests.
     /// </summary>
     /// <typeparam name="TRequest">The type of model in the HTTP Request.</typeparam>
-    /// <typeparam name="TResponse">The type of model to respond with.</typeparam>
-    public abstract class HttpHandler<TRequest, TResponse> : IRequestHandler<TRequest, IActionResult>
+    public abstract class HttpHandler<TRequest> : IRequestHandler<TRequest, IActionResult>
         where TRequest : class, IHttpRequest
-        where TResponse : class
     {
         private readonly ILogger _logger;
 
@@ -62,80 +60,86 @@ namespace HttpMediatR
         /// <summary>
         /// Handler to respond to input.
         /// </summary>
-        /// <param name="query">The query passed to MediatR.</param>
+        /// <param name="input">The input passed to MediatR.</param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        protected abstract Task<HttpResponse<TResponse>> HandleAsync(TRequest input, CancellationToken cancellationToken);
-
-        /// <summary>
-        /// Respond successfully to a HTTP request with a 200 (OK) response.
-        /// </summary>
-        /// <returns></returns>
-        protected HttpResponse<TResponse> Ok()
-        {
-            return new HttpResponse<TResponse>(HttpStatusCode.OK);
-        }
+        protected abstract Task<HttpResponse> HandleAsync(TRequest input, CancellationToken cancellationToken);
 
         /// <summary>
         /// Respond successfully to a HTTP request with a 200 (OK) response and model.
         /// </summary>
+        /// <typeparam name="TResponse"></typeparam>
         /// <param name="response">The type of model to respond with.</param>
         /// <returns></returns>
-        protected HttpResponse<TResponse> Ok(TResponse response)
+        protected HttpResponse Ok<TResponse>(TResponse response) where TResponse : class
         {
             if (response == null)
             {
                 throw new ArgumentNullException(nameof(response));
             }
 
-            return new HttpResponse<TResponse>(response);
+            return new HttpResponse
+            {
+                Model = response,
+                HttpStatusCode = HttpStatusCode.OK
+            };
         }
 
         /// <summary>
         /// Respond successfully to a HTTP request with a 201 (Created) response.
         /// </summary>
         /// <returns></returns>
-        protected HttpResponse<TResponse> Created()
+        protected HttpResponse Created()
         {
-            return new HttpResponse<TResponse>(HttpStatusCode.Created);
+            return new HttpResponse
+            {
+                HttpStatusCode = HttpStatusCode.Created
+            };
         }
 
         /// <summary>
         /// Respond successfully to a HTTP request with a 201 (Created) response and model.
         /// </summary>
+        /// <typeparam name="TResponse"></typeparam>
         /// <param name="response">The type of model to respond with.</param>
         /// <returns></returns>
-        protected HttpResponse<TResponse> Created(TResponse response)
+        protected HttpResponse Created<TResponse>(TResponse response) where TResponse : class
         {
             if (response == null)
             {
                 throw new ArgumentNullException(nameof(response));
             }
 
-            return new HttpResponse<TResponse>(response, HttpStatusCode.Created);
+            return new HttpResponse
+            {
+                Model = response,
+                HttpStatusCode = HttpStatusCode.Created
+            };
         }
 
         /// <summary>
         /// Respond successfully to a HTTP request with a 204 (No Content) response.
         /// </summary>
-        /// <param name="response">The type of model to respond with.</param>
         /// <returns></returns>
-        protected HttpResponse<TResponse> NoContent(TResponse response)
+        protected HttpResponse NoContent()
         {
-            if (response == null)
+            return new HttpResponse
             {
-                throw new ArgumentNullException(nameof(response));
-            }
-
-            return new HttpResponse<TResponse>(response, HttpStatusCode.NoContent);
+                HttpStatusCode = HttpStatusCode.NoContent
+            };
         }
 
         /// <summary>
         /// Return a 404 (Not Found) response.
         /// </summary>
         /// <returns></returns>
-        protected HttpResponse<TResponse> NotFound()
+        protected HttpResponse NotFound()
         {
-            return new HttpResponse<TResponse>("Status Code: 404; Not Found", HttpStatusCode.NotFound);
+            return new HttpResponse
+            {
+                ErrorMessage = "Status Code: 404; Not Found",
+                HttpStatusCode = HttpStatusCode.NotFound
+            };
         }
 
         /// <summary>
@@ -143,14 +147,18 @@ namespace HttpMediatR
         /// </summary>
         /// <param name="errorMessage">The error message to respond with.</param>
         /// <returns></returns>
-        protected HttpResponse<TResponse> Conflict(string errorMessage)
+        protected HttpResponse Conflict(string errorMessage)
         {
             if (string.IsNullOrWhiteSpace(errorMessage))
             {
                 throw new ArgumentNullException(nameof(errorMessage));
             }
 
-            return new HttpResponse<TResponse>(errorMessage, HttpStatusCode.Conflict);
+            return new HttpResponse
+            {
+                ErrorMessage = errorMessage,
+                HttpStatusCode = HttpStatusCode.Conflict
+            };
         }
     }
 }

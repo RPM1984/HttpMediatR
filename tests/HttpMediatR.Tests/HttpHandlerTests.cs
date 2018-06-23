@@ -13,12 +13,12 @@ using Xunit;
 
 namespace HttpMediatR.Tests.HttpHandler
 {
-    public class HandleCoreTests
+    public class HttpHandlerTests
     {
         private readonly TestServer _server;
         private readonly HttpClient _client;
 
-        public HandleCoreTests()
+        public HttpHandlerTests()
         {
             _server = new TestServer(new WebHostBuilder().UseStartup<Startup>());
             _client = _server.CreateClient();
