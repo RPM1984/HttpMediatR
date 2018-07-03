@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using System;
 using System.Net;
 using System.Threading;
@@ -16,6 +17,11 @@ namespace HttpMediatR
         where TRequest : class, IHttpRequest
     {
         private readonly ILogger _logger;
+
+        protected HttpHandler()
+        {
+            _logger = NullLogger.Instance;
+        }
 
         protected HttpHandler(ILogger logger)
         {
