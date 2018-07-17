@@ -5,7 +5,7 @@ A library that combines two awesome things: ASP.NET Core & MediatR, and makes yo
 ![Visual Studio Team services](https://img.shields.io/vso/build/rpm1984/b191ce56-b252-49c8-bba2-23e75b32ab0b/3.svg?style=plastic) [![Codecov](https://img.shields.io/codecov/c/github/RPM1984/HttpMediatR.svg?style=plastic)](https://codecov.io/gh/rpm1984/httpmediatr) [![NuGet](https://img.shields.io/nuget/v/HttpMediatR.svg?style=plastic)](https://www.nuget.org/packages/HttpMediatR/) [![NuGet](https://img.shields.io/nuget/dt/HttpMediatR.svg?style=plastic)](https://www.nuget.org/packages/HttpMediatR/)
 
 # Installation
-![Imgur](https://i.imgur.com/s68DUuP.png)
+![Imgur](https://i.imgur.com/c7qgFyd.png)
 
 # How to use
 - Instead of your input model implementing `IRequest`, implement `IHttpRequest`
